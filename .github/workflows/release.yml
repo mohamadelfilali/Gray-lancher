@@ -3,7 +3,7 @@ name: "Release Build"
 on:
   push:
     tags:
-      - 'v*' # سيتم تشغيل البناء تلقائياً عندما تقوم بعمل Tag جديد يبدأ بـ v مثل v1.0.6
+      - 'v*'
 
 jobs:
   publish-tauri:
@@ -24,13 +24,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build and Publish Tauri App
         uses: tauri-apps/tauri-action@v1
