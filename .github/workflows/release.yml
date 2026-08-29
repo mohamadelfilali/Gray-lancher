@@ -1,0 +1,44 @@
+name: "Release Build"
+
+on:
+  push:
+    tags:
+      - 'v*' # سيتم تشغيل البناء تلقائياً عندما تقوم بعمل Tag جديد يبدأ بـ v مثل v1.0.6
+
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'windows-latest'
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and Publish Tauri App
+        uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Gray Launcher ${{ github.ref_name }}'
+          releaseBody: 'الإصدار الجديد متوفر للتحميل من خلال المرفقات أسفله.'
+          releaseDraft: false
+          prerelease: false
